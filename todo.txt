@@ -1,0 +1,5 @@
+1. 각각의 요일별 task입력 창 만들기
+   a. 체크박스 형식으로 완료여부를 확인할 수 있는 task
+   b. 개수로 count해야 완료여부를 알 수 있는 task
+   c. long term task
+2. 1.의 task를 display하고 해당 task의 완료여부를 확인할 수 있는 창
