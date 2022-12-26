@@ -67,7 +67,7 @@ class Calender(QDialog):
 
         def __call__(self):
             print(f"year: {self.year}\nmonth: {self.month}\ndate: {self.date}\nidx: {self.idx}")
-            print(f"{Calender.Date.called}th Date")
+            # print(f"{Calender.Date.called}th Date")
             
     def __init__(self):
         super().__init__()
@@ -122,12 +122,9 @@ class Calender(QDialog):
         self.setGeometry(300, 300, 500, 500)
 
     def initUi(self):
-        try:
-            self.pushbutton()
-            self.title()
-            self.show()
-        except Exception as e:
-            print(e)
+        self.pushbutton()
+        self.title()
+        self.show()
             
 
 if __name__ == "__main__":
