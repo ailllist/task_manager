@@ -1,3 +1,4 @@
-a__ = 1
+def a(num):
+    print(num)
 
-print(a__)
+print(a(1))

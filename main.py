@@ -18,7 +18,7 @@ class MainApp(QWidget):
         super().__init__()
         self.initUi()
 
-    def pushbutten(self):
+    def pushbutton(self):
         self.q_1 = QPushButton("Calender")
         self.q_1.clicked.connect(self.start_calender)
         self.q_1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -34,7 +34,7 @@ class MainApp(QWidget):
     def title(self):
         self.setWindowTitle("Testing")
         self.setGeometry(0, 0, 300, 500)
-        self.pushbutten()
+        self.pushbutton()
 
     def initUi(self):
         self.title()
@@ -55,7 +55,7 @@ class Calender(QDialog):
             self.date = 0
             self.updated = False
             self.enabled = False
-
+            
         def add_date(self, year, month, date, idx, ref_month):
             self.year = year
             self.month = month
@@ -67,7 +67,8 @@ class Calender(QDialog):
 
         def __call__(self):
             print(f"year: {self.year}\nmonth: {self.month}\ndate: {self.date}\nidx: {self.idx}")
-    
+            print(f"{Calender.Date.called}th Date")
+            
     def __init__(self):
         super().__init__()
         self.initUi()
@@ -85,7 +86,7 @@ class Calender(QDialog):
                 os.mkdir(SAVE_DIR + "/%d/%d" % (clicked_btn.year, clicked_btn.month))
             f = open(SAVE_DIR + "/%d/%d/%d.txt" % (clicked_btn.year, clicked_btn.month, clicked_btn.date), "w")
             
-    def pushbutten(self):
+    def pushbutton(self):
         now = datetime.now()
         cal = Cal()
         days = cal.itermonthdays4(now.year, now.month)
@@ -122,7 +123,7 @@ class Calender(QDialog):
 
     def initUi(self):
         try:
-            self.pushbutten()
+            self.pushbutton()
             self.title()
             self.show()
         except Exception as e:
