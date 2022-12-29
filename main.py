@@ -1,3 +1,4 @@
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from sys import argv, exit
@@ -11,6 +12,16 @@ if "Management" in os.listdir():
 else:
     os.mkdir("Management")
 SAVE_DIR = "Management"
+
+class YMcal:
+    
+    def __init__(self, year, month):
+        self.year = year
+        self.month = month
+    
+    def __call__(self):
+        print("year : ", self.year)
+        print("month : ", self.month)
 
 class MainApp(QWidget):
 
@@ -55,7 +66,7 @@ class Calender(QDialog):
             self.updated = False
             self.enabled = False
             
-        def add_date(self, year, month, date, idx, ref_month):
+        def up_date(self, year, month, date, idx, ref_month):
             self.year = year
             self.month = month
             self.date = date
@@ -84,26 +95,84 @@ class Calender(QDialog):
         elif self.mode == "sub":
             print("testing")
     
-    def pn_btn_clicked(self):
+    def pn_btn_clicked(self): # https://hipolarbear.tistory.com/30 -> stack 구조 쓸 것 +1이 다음 -1이 이전!.
         clicked_btn: QPushButton = self.sender()
         print(clicked_btn.text())  # 입력받은 text가 next인지 prev인지 확인해 달력 재구성.
+        if clicked_btn.text() == "next":
+            self.ym.year = self.ym.year if (self.ym.month + 1) <= 12 else self.ym.year + 1
+            self.ym.month = (self.ym.month % 12) + 1
+            
+        elif clicked_btn.text() == "prev":
+            self.ym.year = self.ym.year if (self.ym.month - 1) >= 1 else self.ym.year - 1
+            if self.ym.month - 1 < 1:
+                self.ym.month = 12
+            else:
+                self.ym.month = self.ym.month - 1
+        self.change_cal()
     
-    def pushbutton(self):
-        now = datetime.now()
+    def change_cal(self):
+        print("in cal")
+        self.ym()
         cal = Cal()
-        days = cal.itermonthdays4(now.year, now.month)
-        days_ = cal.itermonthdays4(now.year, now.month)
+        days = cal.itermonthdays4(self.ym.year, self.ym.month)
+        days_ = cal.itermonthdays4(self.ym.year, self.ym.month)
         for num, i in enumerate(days_): pass
-        day_list = [[self.Date() for _ in range(7)] for _ in range((num+1)//7)]
+        self.day_list = [[self.Date() for _ in range(7)] for _ in range((num + 1) // 7)]
 
         for num, i in enumerate(days):
             idx = (num // 7, num % 7)
-            day_list[idx[0]][idx[1]].add_date(*i, now.month)
-            day_list[idx[0]][idx[1]].setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            day_list[idx[0]][idx[1]].setEnabled(day_list[idx[0]][idx[1]].enabled)
-            day_list[idx[0]][idx[1]].clicked.connect(self.btn_clicked)
+            self.day_list[idx[0]][idx[1]].up_date(*i, self.ym.month)
+            self.day_list[idx[0]][idx[1]].setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.day_list[idx[0]][idx[1]].setEnabled(self.day_list[idx[0]][idx[1]].enabled)
+            self.day_list[idx[0]][idx[1]].clicked.connect(self.btn_clicked)
+
+        L_month = QLabel("%d" % self.ym.month)
+        font = L_month.font()
+        font.setPointSize(20)
+        font.setBold(True)
+        L_month.setFont(font)
+        L_month.setAlignment(Qt.AlignCenter)
+
+        tmp_hbox = QHBoxLayout()
+        if self.mode == "sub":
+            pb_1 = QPushButton("prev")
+            pb_1.clicked.connect(self.pn_btn_clicked)
+            pb_2 = QPushButton("next")
+            pb_2.clicked.connect(self.pn_btn_clicked)
+            tmp_hbox.addWidget(pb_1)
+            tmp_hbox.addWidget(L_month)
+            tmp_hbox.addWidget(pb_2)
+        else:
+            tmp_hbox.addWidget(L_month)
+        vbox = QVBoxLayout()
+        vbox.addLayout(tmp_hbox)
+        for i in self.day_list:
+            hbox = QHBoxLayout()
+            for j in i:
+                hbox.addWidget(j)
+            vbox.addLayout(hbox)
+        self.setLayout(vbox)
+        
+        self.show()
+        
+    def pushbutton(self):
+        now = datetime.now()
+        self.ym = YMcal(now.year, now.month)
+        
+        cal = Cal()
+        days = cal.itermonthdays4(self.ym.year, self.ym.month)
+        days_ = cal.itermonthdays4(self.ym.year, self.ym.month)
+        for num, i in enumerate(days_): pass
+        self.day_list = [[self.Date() for _ in range(7)] for _ in range((num+1)//7)]
+
+        for num, i in enumerate(days):
+            idx = (num // 7, num % 7)
+            self.day_list[idx[0]][idx[1]].up_date(*i, self.ym.month)
+            self.day_list[idx[0]][idx[1]].setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.day_list[idx[0]][idx[1]].setEnabled(self.day_list[idx[0]][idx[1]].enabled)
+            self.day_list[idx[0]][idx[1]].clicked.connect(self.btn_clicked)
             
-        L_month = QLabel("%d" % now.month)
+        L_month = QLabel("%d" % self.ym.month)
         font = L_month.font()
         font.setPointSize(20)
         font.setBold(True)
@@ -123,7 +192,7 @@ class Calender(QDialog):
             tmp_hbox.addWidget(L_month)
         vbox = QVBoxLayout()
         vbox.addLayout(tmp_hbox)
-        for i in day_list:
+        for i in self.day_list:
             hbox = QHBoxLayout()
             for j in i:
                 hbox.addWidget(j)
